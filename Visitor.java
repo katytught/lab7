@@ -774,6 +774,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 }
                 else if(s.equals("putch")){
                     String tt=visitFuncrParams(ctx.funcrParams());
+                    tt=regtoi32(tt);
                     results+="call void @putch(i32 "+tt+")\n";
                     return null;
                 }
