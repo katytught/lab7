@@ -239,6 +239,46 @@ public class Visitor extends calcBaseVisitor<Void>{
         }
         return s;
     }
+    public String regtoi1(String s){
+        if(!s.startsWith("%")){
+            results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
+            Register reg = new Register();
+            reg.setName("%"+Num);
+            reg.setNum(Num);
+            reg.setType("i1");
+            Reglist.getInstance().add(reg);
+            Num++;
+            s=reg.getName();
+            return s;
+        }
+        else if(Reglist.getInstance().getreg(s).getType().equals("i32")){
+            results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
+            Register reg = new Register();
+            reg.setName("%"+Num);
+            reg.setNum(Num);
+            reg.setType("i1");
+            Reglist.getInstance().add(reg);
+            Num++;
+            s=reg.getName();
+            return s;
+        }
+        else if(Reglist.getInstance().getreg(s).getType().equals("array*")){
+            s=regtoi32(s);
+            results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
+            Register reg = new Register();
+            reg.setName("%"+Num);
+            reg.setNum(Num);
+            reg.setType("i1");
+            Reglist.getInstance().add(reg);
+            Num++;
+            s=reg.getName();
+            return s;
+        }
+        else if(Reglist.getInstance().getreg(s).getType().equals("i1")){
+            return s;
+        }
+        return s;
+    }
     @Override public Void visitCompUnit(calcParser.CompUnitContext ctx) {
         for(int i=0;i<ctx.decl().size();i++){
             isglobal = true;
@@ -1566,6 +1606,8 @@ public class Visitor extends calcBaseVisitor<Void>{
             case 3:
                 String s1 = visitLorexp(ctx.lorexp());
                 String s2 = visitLandexp(ctx.landexp());
+                s1=regtoi1(s1);
+                s2=regtoi1(s2);
                 results+="%"+Num+" = or i1 "+s1+","+s2+"\n";
                 Register reg = new Register();
                 reg.setName("%"+Num);
@@ -1587,6 +1629,8 @@ public class Visitor extends calcBaseVisitor<Void>{
             case 3:
                 String s1 =visitLandexp(ctx.landexp());
                 String s2 =visitEqexp(ctx.eqexp());
+                s1=regtoi1(s1);
+                s2=regtoi1(s2);
                 results+="%"+Num+" = and i1 "+s1+","+s2+"\n";
                 Register reg = new Register();
                 reg.setName("%"+Num);
