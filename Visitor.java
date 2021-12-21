@@ -17,6 +17,11 @@ public class Visitor extends calcBaseVisitor<Void>{
     public ArrayList<Var> global = new ArrayList<Var>();
     public ArrayList<Narray> gloarray = new ArrayList<Narray>();
     static Integer getnumber(String s){
+        boolean flag=false;
+        if(s.startsWith("-")){
+            s=s.substring(1);
+            flag = true;
+        }
         int res = 0;
         s = s.toLowerCase(Locale.ROOT);
         if (s.charAt(0)=='0'){
@@ -34,8 +39,14 @@ public class Visitor extends calcBaseVisitor<Void>{
                         res=16*res +10+ ((int) s.charAt(i)-'a');
                     }
                     else {
+                        if(flag){
+                            return -res;
+                        }
                         return res;
                     }
+                }
+                if(flag){
+                    return -res;
                 }
                 return res;
             }
@@ -44,6 +55,9 @@ public class Visitor extends calcBaseVisitor<Void>{
                 for(int i=1;i<len;i++){
                     res=8*res+ (int) s.charAt(i)-48;
                 }
+                if(flag){
+                    return -res;
+                }
                 return res;
             }
         }
@@ -51,7 +65,11 @@ public class Visitor extends calcBaseVisitor<Void>{
             return null;
         }
         else {
-            return Integer.valueOf(s);
+            res = Integer.valueOf(s);
+            if(flag){
+                return -res;
+            }
+            return res;
         }
     }
     public Void arrayinit(Narray narray,String s,int offset){
@@ -84,7 +102,12 @@ public class Visitor extends calcBaseVisitor<Void>{
                 k--;
             }
             else if(s.charAt(i)==','){
-                offset+=weight.get(k-1);
+                if(offset%weight.get(k-1)==0){
+                    offset+=weight.get(k-1);
+                }
+                else {
+                    offset=(offset/(weight.get(k-1))+1)*weight.get(k-1);
+                }
             }
             else if(s.charAt(i)=='%'){
                 results += "%" + Num + " = getelementptr ["+narray.getSize()+" x i32], ["+narray.getSize()+"x i32]* "+narray.getNum()+", i32 0, i32 "+offset+"\n";
@@ -150,7 +173,12 @@ public class Visitor extends calcBaseVisitor<Void>{
                 k--;
             }
             else if(s.charAt(i)==','){
-                offset+=weight.get(k-1);
+                if(offset%weight.get(k-1)==0){
+                    offset+=weight.get(k-1);
+                }
+                else {
+                    offset=(offset/(weight.get(k-1))+1)*weight.get(k-1);
+                }
                 for(int j=res.size();j<offset;j++){
                     res.add(0);
                 }
@@ -690,6 +718,9 @@ public class Visitor extends calcBaseVisitor<Void>{
                     return "%"+(Num-1);
                 }
                 else if(ctx.Addfunc().getText().equals("-")){
+                    if(getnumber(right)!=null){
+                        return "-"+right;
+                    }
                     if(Reglist.getInstance().getreg("%"+(Num-1)).getType().equals("i1")){
                         results+="%"+Num+" = "+"zext i1 %"+(Num-1)+" to i32\n";
                         Register reg = new Register();
@@ -1174,6 +1205,14 @@ public class Visitor extends calcBaseVisitor<Void>{
                     slist.add(getnumber(visitConstExp(ctx.constExp(i))));
                 }
                 narray.setSlist(slist);
+                ArrayList<Integer> weight = new ArrayList<Integer>();
+                for(int i=0;i<narray.getSlist().size()-1;i++){
+                    Integer wei=1;
+                    wei*=narray.getSlist().get(i+1);
+                    weight.add(wei);
+                }
+                weight.add(1);
+                narray.setWeight(weight);
                 if (alllist.size() > 0) {
                     alllist.get(alllist.size() - 1).add(var);
                 } else {
@@ -1301,6 +1340,9 @@ public class Visitor extends calcBaseVisitor<Void>{
                 results+="call void @memset(i32* %"+ Num +", i32 0, i32 "+size*4+")\n";
                 Num++;
                 String fs = visitInitVal(ctx.initVal());
+                if(narray.getName().equals("c")){
+                    System.out.println(2);
+                }
                 arrayinit(narray,fs,0);
                 allarray.get(alllist.size()-1).add(narray);
             }
@@ -1423,7 +1465,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     }
                 }
                 for(int i=0;i<ctx.exp().size();i++){
-                    int s=getnumber(visitExp(ctx.exp(i)));
+                    String s=visitExp(ctx.exp(i));
                     results+="%" + Num +" = mul i32 "+ s+", "+nar.getWeight().get(i)+"\n";
                     Register reg = new Register();
                     reg.setName("%" + Num);
@@ -1473,7 +1515,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     }
                 }
                 for(int i=0;i<ctx.exp().size();i++){
-                    int s=getnumber(visitExp(ctx.exp(i)));
+                    String s=visitExp(ctx.exp(i));
                     results+="%" + Num +" = mul i32 "+ s+", "+nar.getWeight().get(i)+"\n";
                     Register reg = new Register();
                     reg.setName("%" + Num);
