@@ -20,6 +20,7 @@ public class Main {
         boolean hasElseSign = false;
         try{
             while ((str = bufferedreader.readLine()) != null) {
+                System.out.println(str);
                 StringBuilder substring = new StringBuilder();
                 if (0 != str.length()) {
                     if(hasElseSign == false){
