@@ -11,7 +11,6 @@ public class Visitor extends calcBaseVisitor<Void>{
     public int clabel=0;
     public int skip=0;
     public int T=0;
-//    public ArrayList<ArrayList> allconstlist = new ArrayList<ArrayList>();
     public ArrayList<ArrayList> alllist=new ArrayList<ArrayList>();
     public ArrayList<ArrayList> allarray=new ArrayList<ArrayList>();
     public ArrayList<Var> global = new ArrayList<Var>();
@@ -532,17 +531,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                 String left=visitAddexp(ctx.addexp());
                 String right=visitMulexp(ctx.mulexp());
                 if(Objects.equals(ctx.Addfunc().getText(), "+")){
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("i1")){
-                        regtoi32(left);
+                    if(left.startsWith("%")){
+                        left=regtoi32(left);
                     }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("i1")){
-                        regtoi32(right);
-                    }
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
-                        regtoi32(left);
-                    }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
-                        regtoi32(right);
+                    if(right.startsWith("%")){
+                        right=regtoi32(right);
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)+getnumber(right));
@@ -557,49 +550,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                     return "%"+(Num-1);
                 }
                 else if(Objects.equals(ctx.Addfunc().getText(), "-")){
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("i1")){
-                        regtoi32(left);
-//                        results+="%"+Num+" = "+"zext i1 %"+(Num-1)+" to i32\n";
-//                        Register reg = new Register();
-//                        left = "%"+Num;
-//                        reg.setName("%"+Num);
-//                        reg.setNum(Num);
-//                        reg.setType("i32");
-//                        Reglist.getInstance().add(reg);
-//                        Num++;
+                    if(left.startsWith("%")){
+                        left=regtoi32(left);
                     }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("i1")){
-                        regtoi32(right);
-//                        results+="%"+Num+" = "+"zext i1 %"+(Num-1)+" to i32\n";
-//                        Register reg = new Register();
-//                        right = "%"+Num;
-//                        reg.setName("%"+Num);
-//                        reg.setNum(Num);
-//                        reg.setType("i32");
-//                        Reglist.getInstance().add(reg);
-//                        Num++;
-                    }
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
-                        regtoi32(left);
-//                        results+="%"+Num +" = load i32, i32* "+left+"\n";
-//                        Register reg1 = new Register();
-//                        reg1.setName("%" + Num);
-//                        reg1.setNum(Num);
-//                        reg1.setType("i32");
-//                        Reglist.getInstance().add(reg1);
-//                        left = reg1.getName();
-//                        Num++;
-                    }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
-                        regtoi32(right);
-//                        results+="%"+Num +" = load i32, i32* "+right+"\n";
-//                        Register reg1 = new Register();
-//                        reg1.setName("%" + Num);
-//                        reg1.setNum(Num);
-//                        reg1.setType("i32");
-//                        Reglist.getInstance().add(reg1);
-//                        right = reg1.getName();
-//                        Num++;
+                    if(right.startsWith("%")){
+                        right=regtoi32(right);
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)-getnumber(right));
@@ -665,17 +620,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                 String left=visitMulexp(ctx.mulexp());
                 String right=visitUnaryexp(ctx.unaryexp());
                 if(ctx.Mulfunc().getText().equals("*")){
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("i1")){
-                        regtoi32(left);
+                    if(left.startsWith("%")){
+                        left=regtoi32(left);
                     }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("i1")){
-                        regtoi32(right);
-                    }
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
-                        regtoi32(left);
-                    }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
-                        regtoi32(right);
+                    if(right.startsWith("%")){
+                        right=regtoi32(right);
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)*getnumber(right));
@@ -690,17 +639,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                     return "%"+(Num-1);
                 }
                 else if(ctx.Mulfunc().getText().equals("/")) {
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("i1")){
-                        regtoi32(left);
+                    if(left.startsWith("%")){
+                        left=regtoi32(left);
                     }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("i1")){
-                        regtoi32(right);
-                    }
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
-                        regtoi32(left);
-                    }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
-                        regtoi32(right);
+                    if(right.startsWith("%")){
+                        right=regtoi32(right);
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)/getnumber(right));
@@ -715,17 +658,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                     return "%" + (Num - 1);
                 }
                 else if(ctx.Mulfunc().getText().equals("%")) {
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("i1")){
-                        regtoi32(left);
+                    if(left.startsWith("%")){
+                        left=regtoi32(left);
                     }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("i1")){
-                        regtoi32(right);
-                    }
-                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
-                        regtoi32(left);
-                    }
-                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
-                        regtoi32(right);
+                    if(right.startsWith("%")){
+                        right=regtoi32(right);
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)%getnumber(right));
