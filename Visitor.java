@@ -354,6 +354,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 int Tright=++T;
                 int Tmid=++T;
                 String s = visitCond(ctx.cond());
+                s=regtoi32(s);
                 if(getnumber(s)!=null){
                     results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
                     Register reg = new Register();
@@ -396,6 +397,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 int Tright=++T;
                 int Tmid=T;
                 String s = visitCond(ctx.cond());
+                s=regtoi32(s);
                 if(getnumber(s)!=null){
                     results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
                     Register reg = new Register();
@@ -433,6 +435,7 @@ public class Visitor extends calcBaseVisitor<Void>{
             results+="br label %t"+Tleft+"\n";
             results+="t"+Tleft+":\n";
             String s = visitCond(ctx.cond());
+            s=regtoi32(s);
             if(getnumber(s)!=null){
                 results+="%"+Num+" = icmp ne i32 "+ s + ", 0"+ "\n";
                 Register reg = new Register();
@@ -443,7 +446,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Num++;
             }
             else if(Reglist.getInstance().getreg(s).getType().equals("i32")){
-                results+="%"+Num+" = icmp ne "+Reglist.getInstance().getreg(s).getType() +s + ", 0"+ "\n";
+                results+="%"+Num+" = icmp ne "+Reglist.getInstance().getreg(s).getType()+" " +s + ", 0"+ "\n";
                 Register reg = new Register();
                 reg.setName("%"+Num);
                 reg.setNum(Num);
@@ -1460,6 +1463,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register lastreg=null;
                 for(int i=0;i<ctx.exp().size();i++){
                     String s=visitExp(ctx.exp(i));
+                    s = regtoi32(s);
                     results+="%" + Num +" = mul i32 "+ s+", "+nar.getWeight().get(i)+"\n";
                     Register reg = new Register();
                     reg.setName("%" + Num);
@@ -1507,6 +1511,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 }
                 for(int i=0;i<ctx.exp().size();i++){
                     String s=visitExp(ctx.exp(i));
+                    s = regtoi32(s);
                     results+="%" + Num +" = mul i32 "+ s+", "+nar.getWeight().get(i)+"\n";
                     Register reg = new Register();
                     reg.setName("%" + Num);
@@ -1602,6 +1607,8 @@ public class Visitor extends calcBaseVisitor<Void>{
             case 3:
                 String t1 = visitEqexp(ctx.eqexp());
                 String t2 = visitRelexp(ctx.relexp());
+                t1=regtoi32(t1);
+                t2=regtoi32(t2);
                 if(ctx.Judgefunc().getText().equals("==")){
                     results+="%"+Num+" = icmp eq i32 " + t1 + ", "+ t2 + "\n";
                 }
@@ -1628,6 +1635,8 @@ public class Visitor extends calcBaseVisitor<Void>{
             case 3:
                 String s1 = visitRelexp(ctx.relexp());
                 String s2 = visitAddexp(ctx.addexp());
+                s1=regtoi32(s1);
+                s2=regtoi32(s2);
                 if(ctx.Comfunc().getText().equals("<=")){
                     results+="%"+Num+" = icmp sle i32 " + s1 + ", "+ s2 + "\n";
                 }
