@@ -114,7 +114,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg3 = new Register();
                 reg3.setName("%" + Num);
                 reg3.setNum(Num);
-                reg3.setType("pointer");
+                reg3.setType("array*");
                 Reglist.getInstance().add(reg3);
                 Num++;
                 String temp = s.substring(i);
@@ -139,7 +139,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg3 = new Register();
                 reg3.setName("%" + Num);
                 reg3.setNum(Num);
-                reg3.setType("pointer");
+                reg3.setType("array*");
                 Reglist.getInstance().add(reg3);
                 Num++;
                 String temp = s.substring(i);
@@ -560,6 +560,26 @@ public class Visitor extends calcBaseVisitor<Void>{
                         Reglist.getInstance().add(reg);
                         Num++;
                     }
+                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+left+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        left = reg1.getName();
+                        Num++;
+                    }
+                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+right+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        right = reg1.getName();
+                        Num++;
+                    }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)-getnumber(right));
                     }
@@ -644,6 +664,26 @@ public class Visitor extends calcBaseVisitor<Void>{
                         Reglist.getInstance().add(reg);
                         Num++;
                     }
+                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+left+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        left = reg1.getName();
+                        Num++;
+                    }
+                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+right+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        right = reg1.getName();
+                        Num++;
+                    }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)*getnumber(right));
                     }
@@ -677,6 +717,26 @@ public class Visitor extends calcBaseVisitor<Void>{
                         Reglist.getInstance().add(reg);
                         Num++;
                     }
+                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+left+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        left = reg1.getName();
+                        Num++;
+                    }
+                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+right+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        right = reg1.getName();
+                        Num++;
+                    }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
                         return String.valueOf(getnumber(left)/getnumber(right));
                     }
@@ -708,6 +768,26 @@ public class Visitor extends calcBaseVisitor<Void>{
                         reg.setNum(Num);
                         reg.setType("i32");
                         Reglist.getInstance().add(reg);
+                        Num++;
+                    }
+                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+left+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        left = reg1.getName();
+                        Num++;
+                    }
+                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+right+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        right = reg1.getName();
                         Num++;
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
@@ -1265,7 +1345,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg3 = new Register();
                 reg3.setName("%" + Num);
                 reg3.setNum(Num);
-                reg3.setType("pointer");
+                reg3.setType("array*");
                 Reglist.getInstance().add(reg3);
                 results+="call void @memset(i32* %"+ Num +", i32 0, i32 "+size*4+")\n";
                 Num++;
@@ -1372,7 +1452,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg3 = new Register();
                 reg3.setName("%" + Num);
                 reg3.setNum(Num);
-                reg3.setType("pointer");
+                reg3.setType("array*");
                 Reglist.getInstance().add(reg3);
                 results+="call void @memset(i32* %"+ Num +", i32 0, i32 "+size*4+")\n";
                 Num++;
