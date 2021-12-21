@@ -227,7 +227,7 @@ public class Visitor extends calcBaseVisitor<Void>{
             return s;
         }
         else if(Reglist.getInstance().getreg(s).getType().equals("i1")){
-            results+="%"+Num+" = "+"zext i1 %"+Reglist.getInstance().getreg(s).getName()+" to i32\n";
+            results+="%"+Num+" = "+"zext i1 "+Reglist.getInstance().getreg(s).getName()+" to i32\n";
             Register reg = new Register();
             s = "%"+Num;
             reg.setName("%"+Num);
