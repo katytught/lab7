@@ -19,41 +19,21 @@ public class Main {
         int index;
         boolean hasElseSign = false;
         try{
+            StringBuilder substring = new StringBuilder();
             while ((str = bufferedreader.readLine()) != null) {
-                System.out.println(str);
-                StringBuilder substring = new StringBuilder();
+                substring.append(" ");
                 if (0 != str.length()) {
-                    if(hasElseSign == false){
-                        for(index = 0;index < str.length();index++){
+                    for(index = 0;index < str.length();index++){
+                        if(hasElseSign == false){
                             ch = str.charAt(index);
                             if((ch == '/')){
                                 if(str.charAt(index+1) == '/'){
-                                    str = str.substring(0,index);
                                     break;
                                 }
                                 if(str.charAt(index+1)=='*'){
                                     hasElseSign = true;
-//                                    bw.write(str.substring(0,index));
-//                                    bw.newLine();
-//                                    bw.flush();
-                                    for(int dex = index;dex<str.length();dex++){
-                                        ch = str.charAt(dex);
-                                        if(ch!='*') continue;
-                                        else {
-                                            if(dex+1>=str.length()) {
-                                                bw.write(substring.toString());
-                                                bw.newLine();
-                                                bw.flush();
-                                                continue;
-                                            };
-                                            if(str.charAt(dex+1)!='/') continue;
-                                            else {
-                                                hasElseSign = false;
-                                                index = dex+1;
-                                            }
-                                        }
-                                    }
-//                                    break;
+                                    index++;
+                                    continue;
                                 }
                                 else {
                                     substring.append(ch);
@@ -63,23 +43,31 @@ public class Main {
                                 substring.append(ch);
                             }
                         }
-                        if(hasElseSign) continue;
-                    }
-                    else{
-                        for(index = 0;index < str.length();index++){
+                        else{
                             ch = str.charAt(index);
-                            if((ch == '*')&&(index<str.length()-1)&&(str.charAt(index+1) == '/')){
-                                hasElseSign = false;
-                                break;
+                            if((ch == '*')){
+                                if((index+1)>=str.length()){
+                                    continue;
+                                }
+                                if(str.charAt(index+1) == '/'){
+                                    index++;
+                                    hasElseSign = false;
+                                }
+                                else {
+                                    continue;
+                                }
+                            }
+                            else {
+                                continue;
                             }
                         }
-                        continue;
                     }
-                    bw.write(substring.toString());
-                    bw.newLine();
-                    bw.flush();
                 }
             }
+            bw.write(substring.toString());
+            bw.newLine();
+            bw.flush();
+
         }
         catch (Exception ioe){
             ioe.printStackTrace();}
