@@ -122,6 +122,16 @@ public class Visitor extends calcBaseVisitor<Void>{
                 int bra=(temp.indexOf("}")!=-1)?temp.indexOf("}")+i:99999;
                 String sub=s.substring(i,Math.min(dot,bra));
                 i+=Math.min(dot,bra)-i-1;
+                if(Reglist.getInstance().getreg(sub).getType().equals("array*")){
+                    results+="%"+Num +" = load i32, i32* "+sub+"\n";
+                    Register reg1 = new Register();
+                    reg1.setName("%" + Num);
+                    reg1.setNum(Num);
+                    reg1.setType("i32");
+                    Reglist.getInstance().add(reg1);
+                    sub = reg1.getName();
+                    Num++;
+                }
                 results+="store i32 "+ sub +", i32* "+reg3.getName()+"\n";
             }
             else{
@@ -242,20 +252,24 @@ public class Visitor extends calcBaseVisitor<Void>{
             }
             String s=visitExp(ctx.exp());
             VarList list=VarList.getInstance();
+            String name = ctx.lval().getText();
+            if(name.indexOf("[")!=-1){
+                name = name.substring(0,name.indexOf("["));
+            }
             if(alllist.size()>0){
                 ArrayList<Var> tlist = alllist.get(alllist.size()-1);
                 for(int i=0;i<tlist.size();i++){
-                    if(tlist.get(i).getName().equals(ctx.lval().getText())&&tlist.get(i).isInit()&&tlist.get(i).isIsconst()){
+                    if(tlist.get(i).getName().equals(name)&&tlist.get(i).isInit()&&tlist.get(i).isIsconst()){
                         System.exit(-1);
                     }
                 }
             }
-            else if(list.getVar(ctx.lval().getText()).isIsconst()&&list.getVar(ctx.lval().getText()).isInit()){
+            else if(list.getVar(name).isIsconst()&&list.getVar(name).isInit()){
                 System.exit(-1);
             }
             else{
                 for(int i=0;i<global.size();i++){
-                    if(global.get(i).getName().equals(ctx.lval().getText())&&global.get(i).isIsconst()){
+                    if(global.get(i).getName().equals(name)&&global.get(i).isIsconst()){
                         System.exit(-1);
                     }
                 }
@@ -264,24 +278,27 @@ public class Visitor extends calcBaseVisitor<Void>{
                 for(int i=alllist.size()-1;i>=0;i--){
                     ArrayList<Var> tlist = alllist.get(i);
                     for(int j=0;j<tlist.size();j++){
-                        if(tlist.get(j).getName().equals(ctx.lval().getText())){
+                        if(tlist.get(j).getName().equals(name)){
                             tlist.get(j).setInit(true);
-                            results+="store i32 "+s+", i32* "+ tlist.get(j).getNum()+"\n";
+                            results+="store i32 "+s+", i32* "+ a+"\n";
+//                            results+="store i32 "+s+", i32* "+ tlist.get(j).getNum()+"\n";
                             return null;
                         }
                     }
                 }
                 for(int i=0;i<global.size();i++){
-                    if(global.get(i).getName().equals(ctx.lval().getText())){
+                    if(global.get(i).getName().equals(name)){
                         global.get(i).setInit(true);
-                        results+="store i32 "+s+", i32* "+ global.get(i).getNum()+"\n";
+                        results+="store i32 "+s+", i32* "+ a+"\n";
+//                        results+="store i32 "+s+", i32* "+ global.get(i).getNum()+"\n";
                         return null;
                     }
                 }
             }
             else {
-                list.getVar(ctx.lval().getText()).setInit(true);
-                results+="store i32 "+s+", i32* "+ list.getVar(ctx.lval().getText()).getNum()+"\n";
+                list.getVar(name).setInit(true);
+                results+="store i32 "+s+", i32* "+ a+"\n";
+//                results+="store i32 "+s+", i32* "+ list.getVar(ctx.lval().getText()).getNum()+"\n";
             }
         }
         else if(ctx.block()!=null){
@@ -488,6 +505,26 @@ public class Visitor extends calcBaseVisitor<Void>{
                         reg.setNum(Num);
                         reg.setType("i32");
                         Reglist.getInstance().add(reg);
+                        Num++;
+                    }
+                    if(left.startsWith("%")&&Reglist.getInstance().getreg(left).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+left+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        left = reg1.getName();
+                        Num++;
+                    }
+                    if(right.startsWith("%")&&Reglist.getInstance().getreg(right).getType().equals("array*")){
+                        results+="%"+Num +" = load i32, i32* "+right+"\n";
+                        Register reg1 = new Register();
+                        reg1.setName("%" + Num);
+                        reg1.setNum(Num);
+                        reg1.setType("i32");
+                        Reglist.getInstance().add(reg1);
+                        right = reg1.getName();
                         Num++;
                     }
                     if(getnumber(left)!=null&&getnumber(right)!=null){
@@ -1464,6 +1501,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                         break;
                     }
                 }
+                Register lastreg=null;
                 for(int i=0;i<ctx.exp().size();i++){
                     String s=visitExp(ctx.exp(i));
                     results+="%" + Num +" = mul i32 "+ s+", "+nar.getWeight().get(i)+"\n";
@@ -1472,14 +1510,18 @@ public class Visitor extends calcBaseVisitor<Void>{
                     reg.setNum(Num);
                     reg.setType("i32");
                     Reglist.getInstance().add(reg);
+                    if(lastreg==null){
+                        lastreg = reg;
+                    }
                     Num++;
                     if(i!=0){
-                        results+="%" + Num +" = add i32 %"+ (Num-1)+", %"+(Num-2)+"\n";
+                        results+="%" + Num +" = add i32 %"+ (Num-1)+", %"+lastreg.getNum()+"\n";
                         Register reg2 = new Register();
                         reg2.setName("%" + Num);
                         reg2.setNum(Num);
                         reg2.setType("i32");
                         Reglist.getInstance().add(reg2);
+                        lastreg = reg2;
                         Num++;
                     }
                 }
@@ -1487,16 +1529,16 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg = new Register();
                 reg.setName("%" + Num);
                 reg.setNum(Num);
-                reg.setType("i32");
+                reg.setType("array*");
                 Reglist.getInstance().add(reg);
                 Num++;
-                results+="%"+Num +" = load i32, i32* %"+(Num-1)+"\n";
-                Register reg1 = new Register();
-                reg1.setName("%" + Num);
-                reg1.setNum(Num);
-                reg1.setType("i32");
-                Reglist.getInstance().add(reg1);
-                Num++;
+//                results+="%"+Num +" = load i32, i32* %"+(Num-1)+"\n";
+//                Register reg1 = new Register();
+//                reg1.setName("%" + Num);
+//                reg1.setNum(Num);
+//                reg1.setType("i32");
+//                Reglist.getInstance().add(reg1);
+//                Num++;
             }
             else {
                 Narray nar = new Narray();
@@ -1537,16 +1579,16 @@ public class Visitor extends calcBaseVisitor<Void>{
                 Register reg = new Register();
                 reg.setName("%" + Num);
                 reg.setNum(Num);
-                reg.setType("i32");
+                reg.setType("array*");
                 Reglist.getInstance().add(reg);
                 Num++;
-                results+="%"+Num +" = load i32, i32* %"+(Num-1)+"\n";
-                Register reg1 = new Register();
-                reg1.setName("%" + Num);
-                reg1.setNum(Num);
-                reg1.setType("i32");
-                Reglist.getInstance().add(reg1);
-                Num++;
+//                results+="%"+Num +" = load i32, i32* %"+(Num-1)+"\n";
+//                Register reg1 = new Register();
+//                reg1.setName("%" + Num);
+//                reg1.setNum(Num);
+//                reg1.setType("i32");
+//                Reglist.getInstance().add(reg1);
+//                Num++;
             }
             return "%" + (Num - 1);
         }
