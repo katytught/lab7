@@ -11,6 +11,8 @@ public class Visitor extends calcBaseVisitor<Void>{
     public int clabel=0;
     public int skip=0;
     public int T=0;
+    public ArrayList<Integer> blabels=new ArrayList<Integer>();
+    public ArrayList<Integer> clabels=new ArrayList<Integer>();
     public ArrayList<ArrayList> alllist=new ArrayList<ArrayList>();
     public ArrayList<ArrayList> allarray=new ArrayList<ArrayList>();
     public ArrayList<Var> global = new ArrayList<Var>();
@@ -163,7 +165,7 @@ public class Visitor extends calcBaseVisitor<Void>{
             }
         }
         if(size>narray.getSlist().size()){
-            System.exit(-1);
+            System.exit(-2);
         }
         ArrayList<Integer> res = new ArrayList<Integer>();
         ArrayList<Integer> weight = new ArrayList<Integer>();
@@ -319,7 +321,7 @@ public class Visitor extends calcBaseVisitor<Void>{
         if(ctx.lval()!=null){
             String a=visitLval(ctx.lval());
             if(getnumber(a)!=null){
-                System.exit(-1);
+                System.exit(-3);
             }
             String s=visitExp(ctx.exp());
             VarList list=VarList.getInstance();
@@ -331,17 +333,17 @@ public class Visitor extends calcBaseVisitor<Void>{
                 ArrayList<Var> tlist = alllist.get(alllist.size()-1);
                 for(int i=0;i<tlist.size();i++){
                     if(tlist.get(i).getName().equals(name)&&tlist.get(i).isInit()&&tlist.get(i).isIsconst()){
-                        System.exit(-1);
+                        System.exit(-4);
                     }
                 }
             }
             else if(list.getVar(name).isIsconst()&&list.getVar(name).isInit()){
-                System.exit(-1);
+                System.exit(-5);
             }
             else{
                 for(int i=0;i<global.size();i++){
                     if(global.get(i).getName().equals(name)&&global.get(i).isIsconst()){
-                        System.exit(-1);
+                        System.exit(-6);
                     }
                 }
             }
@@ -498,18 +500,24 @@ public class Visitor extends calcBaseVisitor<Void>{
             results+="t"+Tright+":\n";
             blabel=Tmid;
             clabel=Tleft;
+            blabels.add(blabel);
+            clabels.add(clabel);
             visit(ctx.stmt(0));
+            blabels.remove(blabels.size()-1);
+            clabels.remove(clabels.size()-1);
             blabel=0;
             clabel=0;
             results+="br label %t"+Tleft+"\n";
             results+="t"+Tmid+":\n";
         }
         else if(ctx.getText().startsWith("break")){
-            results+="br label %t"+blabel+"\n";
+            results+="br label %t"+blabels.get(blabels.size()-1)+"\n";
+//            results+="br label %t"+blabel+"\n";
             skip++;
         }
         else if(ctx.getText().startsWith("continue")){
-            results+="br label %t"+clabel+"\n";
+            results+="br label %t"+clabels.get(clabels.size()-1)+"\n";
+//            results+="br label %t"+clabel+"\n";
             skip++;
         }
         else if(ctx.getText().startsWith("return")){
@@ -543,7 +551,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     int b=0;
                     for(int i=0;i<global.size();i++){
                         if(global.get(i).getName().equals(left)&&!global.get(i).isIsconst()){
-                            System.exit(-1);
+                            System.exit(-7);
                         }
                         if(global.get(i).getName().equals(left)){
                             a=global.get(i).getValue();
@@ -555,7 +563,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     }
                     for(int i=0;i<global.size();i++){
                         if(global.get(i).getName().equals(right)&&!global.get(i).isIsconst()){
-                            System.exit(-1);
+                            System.exit(-8);
                         }
                         if(global.get(i).getName().equals(right)){
                             b=global.get(i).getValue();
@@ -630,7 +638,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     int b=0;
                     for(int i=0;i<global.size();i++){
                         if(global.get(i).getName().equals(left)&&!global.get(i).isIsconst()){
-                            System.exit(-1);
+                            System.exit(-9);
                         }
                         if(global.get(i).getName().equals(left)){
                             a=global.get(i).getValue();
@@ -642,7 +650,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     }
                     for(int i=0;i<global.size();i++){
                         if(global.get(i).getName().equals(right)&&!global.get(i).isIsconst()){
-                            System.exit(-1);
+                            System.exit(-10);
                         }
                         if(global.get(i).getName().equals(right)){
                             b=global.get(i).getValue();
@@ -869,7 +877,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 String ident = ctx.Idigit().getText();
                 for (int i = 0; i < global.size(); i++) {
                     if (global.get(i).getName().equals(ident)) {
-                        System.exit(-1);
+                        System.exit(-11);
                     }
                 }
                 Var var = new Var();
@@ -889,11 +897,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                 ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                 for (int i = 0; i < tlist.size(); i++) {
                     if (tlist.get(i).getName().equals(ident)) {
-                        System.exit(-1);
+                        System.exit(-12);
                     }
                 }
             } else if (VarList.getInstance().getVar(ident) != null) {
-                System.exit(-1);
+                System.exit(-13);
             }
             Var var = new Var();
             var.setName(ident);
@@ -918,7 +926,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                 String ident = ctx.Idigit().getText();
                 for (int i = 0; i < global.size(); i++) {
                     if (global.get(i).getName().equals(ident)) {
-                        System.exit(-1);
+                        System.exit(-14);
                     }
                 }
                 Var var = new Var();
@@ -966,11 +974,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                 ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                 for (int i = 0; i < tlist.size(); i++) {
                     if (tlist.get(i).getName().equals(ident)) {
-                        System.exit(-1);
+                        System.exit(-15);
                     }
                 }
             } else if (VarList.getInstance().getVar(ident) != null) {
-                System.exit(-1);
+                System.exit(-16);
             }
             Var var = new Var();
             var.setName(ident);
@@ -1052,7 +1060,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                         String ident1 = ctx.Idigit().getText();
                         for (int i = 0; i < global.size(); i++) {
                             if (global.get(i).getName().equals(ident1)) {
-                                System.exit(-1);
+                                System.exit(-17);
                             }
                         }
                         Var var1 = new Var();
@@ -1072,11 +1080,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                         ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                         for (int i = 0; i < tlist.size(); i++) {
                             if (tlist.get(i).getName().equals(ident)) {
-                                System.exit(-1);
+                                System.exit(-18);
                             }
                         }
                     } else if (VarList.getInstance().getVar(ident) != null) {
-                        System.exit(-1);
+                        System.exit(-19);
                     }
                     Var var = new Var();
                     var.setName(ident);
@@ -1102,7 +1110,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                         String ident1 = ctx.Idigit().getText();
                         for (int i = 0; i < global.size(); i++) {
                             if (global.get(i).getName().equals(ident1)) {
-                                System.exit(-1);
+                                System.exit(-20);
                             }
                         }
                         Var var1 = new Var();
@@ -1124,11 +1132,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                         ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                         for (int i = 0; i < tlist.size(); i++) {
                             if (tlist.get(i).getName().equals(ident)) {
-                                System.exit(-1);
+                                System.exit(-21);
                             }
                         }
                     } else if (VarList.getInstance().getVar(ident) != null) {
-                        System.exit(-1);
+                        System.exit(-22);
                     }
                     var = new Var();
                     var.setName(ident);
@@ -1162,7 +1170,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     String ident = ctx.Idigit().getText();
                     for (int i = 0; i < global.size(); i++) {
                         if (global.get(i).getName().equals(ident)) {
-                            System.exit(-1);
+                            System.exit(-23);
                         }
                     }
                     Var var = new Var();
@@ -1214,11 +1222,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                     ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                     for (int i = 0; i < tlist.size(); i++) {
                         if (tlist.get(i).getName().equals(ident)) {
-                            System.exit(-1);
+                            System.exit(-24);
                         }
                     }
                 } else if (VarList.getInstance().getVar(ident) != null) {
-                    System.exit(-1);
+                    System.exit(-25);
                 }
                 Var var = new Var();
                 var.setName(ident);
@@ -1276,7 +1284,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     String ident = ctx.Idigit().getText();
                     for (int i = 0; i < global.size(); i++) {
                         if (global.get(i).getName().equals(ident)) {
-                            System.exit(-1);
+                            System.exit(-26);
                         }
                     }
                     Var var = new Var();
@@ -1329,11 +1337,11 @@ public class Visitor extends calcBaseVisitor<Void>{
                     ArrayList<Var> tlist = alllist.get(alllist.size() - 1);
                     for (int i = 0; i < tlist.size(); i++) {
                         if (tlist.get(i).getName().equals(ident)) {
-                            System.exit(-1);
+                            System.exit(-27);
                         }
                     }
                 } else if (VarList.getInstance().getVar(ident) != null) {
-                    System.exit(-1);
+                    System.exit(-28);
                 }
                 Var var = new Var();
                 var.setName(ident);
@@ -1439,7 +1447,7 @@ public class Visitor extends calcBaseVisitor<Void>{
                     if (global.get(i).getName().equals(ctx.getText())) {
                         var = global.get(i);
                         if (isglobal && !global.get(i).isIsconst()) {
-                            System.exit(-1);
+                            System.exit(-29);
                         }
                         if (global.get(i).isIsconst()) {
                             return String.valueOf(var.getValue());
@@ -1456,10 +1464,10 @@ public class Visitor extends calcBaseVisitor<Void>{
                 }
             }
             if(var.getType().equals("a")){
-                System.exit(-1);
+                System.exit(-30);
             }
             if (!var.isIsconst() && isconst) {
-                System.exit(-1);
+                System.exit(-31);
             }
             if (var.isIsconst()) {
                 return String.valueOf(var.getValue());
